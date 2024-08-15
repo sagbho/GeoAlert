@@ -1,6 +1,7 @@
+import { config } from "dotenv";
+config();
 import express, { Request, Response } from "express";
 import mongoose from "mongoose";
-
 import User from "./models/User";
 
 const app = express();
@@ -24,12 +25,8 @@ app.post("/register", async (req: Request, res: Response) => {
   res.json(createdUser);
 });
 
-mongoose
-  .connect(
-    "mongodb+srv://sagar:4y4C4G7eXUBjfjxK@cluster0.ar6le.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-  )
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log("listening on port ", PORT);
-    });
+mongoose.connect(process.env.MONGO_URL!).then(() => {
+  app.listen(PORT, () => {
+    console.log("listening on port ", PORT);
   });
+});
