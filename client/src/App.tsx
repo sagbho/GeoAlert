@@ -1,12 +1,17 @@
-import "./App.css";
-import Routes from "./Routes";
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Login from "./routes/Login";
+import Register from "./routes/Register";
 
-function App() {
+const App: React.FC = () => {
   return (
-    <>
-      <Routes />
-    </>
+    <Router>
+      <Switch>
+        <Route path="/login" Component={Login} />
+        <Route path="/register" Component={Register} />
+      </Switch>
+    </Router>
   );
-}
+};
 
 export default App;

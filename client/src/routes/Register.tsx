@@ -1,41 +1,72 @@
 import React, { useState } from "react";
-import { createUser } from "../api/createUser";
+import Logo from "./Logo";
 
-export default function Register() {
+const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [users, setUsers] = useState([]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const user = await createUser(email, password);
-    setUsers([...users, user]);
-    setEmail("");
-    setPassword("");
+    try {
+      const response = await fetch(`http://localhost:8080/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        alert("Registration failed");
+        throw new Error("Registration failed");
+      }
+
+      const data = await response.json();
+      alert("Registration successful:");
+      console.log("Registration successful:", data);
+      setEmail("");
+      setPassword("");
+    } catch (error) {
+      alert("Registration failed:");
+      alert(error);
+      console.log("Registration failed:", error);
+    }
   };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="email">Email</label>
-      <input
-        type="email"
-        id="email"
-        name="email"
-        value={email}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          setEmail(e.target.value);
-        }}
-      />
-      <label htmlFor="password">Password</label>
-      <input
-        type="password"
-        id="password"
-        name="password"
-        value={password}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          setPassword(e.target.value);
-        }}
-      />
-      <button type="submit">Register account</button>
-    </form>
+    <div className="flex flex-col items-center p-24">
+      <Logo />
+      <h1 className="text-3xl font-bold tracking-tighter p-4">Register</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="border-black bg-slate-200 rounded-md active:border-none"
+          />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="border-black bg-slate-200 rounded-md active:border-none"
+          />
+        </div>
+        <button
+          type="submit"
+          className="bg-black text-white px-4 py-2 rounded-md"
+        >
+          Register
+        </button>
+      </form>
+    </div>
   );
-}
+};
+
+export default Register;

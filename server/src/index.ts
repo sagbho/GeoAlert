@@ -1,58 +1,44 @@
-import { config } from "dotenv";
-config();
-import express, { Request, Response } from "express";
+import express from "express";
 import mongoose from "mongoose";
+import passport from "passport";
+import session from "express-session";
+import dotenv from "dotenv";
+import authRoutes from "./routes/auth";
+import "./config/passport";
 import cors from "cors";
-import User from "./models/User";
+
+dotenv.config();
 
 const app = express();
-
-app.use(
-  cors({
-    origin: "*",
-  })
-);
-const PORT = 8080;
-
-//Middleware
 app.use(express.json());
 
-//Endpoints
+// Add this to your server setup
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("hello world");
-});
+const PORT = process.env.PORT || 8080;
+const MONGO_URI = process.env.MONGO_URI;
 
-//GET -- Retrieve User
-app.get("/register", async (req: Request, res: Response) => {
-  //Fetch all users
-  const users = await User.find();
-  res.json(users);
-});
+if (!MONGO_URI) {
+  throw new Error("MONGO_URI is not defined in the environment variables");
+}
 
-//POST -- Create User
-app.post("/register", async (req: Request, res: Response) => {
-  const user = new User({
-    email: req.body.email,
-    password: req.body.password,
-  });
-  const createdUser = await user.save();
-  res.json(createdUser);
-});
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.log(err));
 
-//DELETE -- Delete User
-app.delete("/register/:userId", async (req: Request, res: Response) => {
-  //Retrieve user id
-  const userId = req.params.userId;
+app.use(session({ secret: "secret", resave: true, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
-  //Delete user from mongo
-  const user = await User.findByIdAndDelete(userId);
-  //Return deleted user to user
-  res.json(user);
-});
+app.use("/auth", authRoutes);
 
-mongoose.connect(process.env.MONGO_URL!).then(() => {
-  app.listen(PORT, () => {
-    console.log("listening on port ", PORT);
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
