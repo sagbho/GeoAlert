@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { deleteUser } from "../api/deleteUser";
 import { getUsers } from "../api/getUsers";
 
+// Define the User type
+interface User {
+  _id: string;
+  email: string;
+}
+
 export default function Dashboard() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const newUsers = await getUsers();
+      const newUsers: User[] = await getUsers();
       setUsers(newUsers);
     };
 
@@ -16,9 +22,10 @@ export default function Dashboard() {
 
   const handleDeletion = async (userId: string) => {
     await deleteUser(userId);
-    //Optimistic update
+    // Optimistic update
     setUsers(users.filter((user) => user._id !== userId));
   };
+
   return (
     <div>
       {users.map((user) => (

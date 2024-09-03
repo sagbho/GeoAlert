@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Logo from "./Logo";
+import { redirect } from "react-router-dom";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -26,6 +27,7 @@ const Register = () => {
       console.log("Registration successful:", data);
       setEmail("");
       setPassword("");
+      redirect("/login");
     } catch (error) {
       alert("Registration failed:");
       alert(error);
@@ -37,9 +39,9 @@ const Register = () => {
     <div className="flex flex-col items-center p-24">
       <Logo />
       <h1 className="text-3xl font-bold tracking-tighter p-4">Register</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label>Email:</label>
+          <label className="pr-2">Email:</label>
           <input
             type="email"
             value={email}
@@ -49,7 +51,7 @@ const Register = () => {
           />
         </div>
         <div>
-          <label>Password:</label>
+          <label className="pr-2">Password:</label>
           <input
             type="password"
             value={password}
